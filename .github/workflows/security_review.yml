@@ -1,0 +1,25 @@
+# .github/workflows/security_review.yml
+
+name: Secure Code Review Bot
+
+# Este workflow roda sempre que um Pull Request é aberto ou atualizado
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  semgrep:
+    name: Análise de Segurança com Semgrep
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Faz o checkout do código do seu repositório para que a Action possa analisá-lo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Roda a Action do Semgrep. Ela fará a análise e postará os comentários no PR.
+      - name: Run Semgrep CI
+        uses: semgrep/semgrep-action@v2
+        with:
+          # Aponta para o arquivo de configuração onde estão as nossas regras customizadas
+          # Além das regras customizadas, o Semgrep usará um conjunto de regras padrão da comunidade.
+          config: .semgrep/rules.yml

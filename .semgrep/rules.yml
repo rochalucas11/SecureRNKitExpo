@@ -1,0 +1,66 @@
+# .semgrep/rules.yml
+# Regras de segurança adaptadas para um projeto React Native / Expo.
+
+rules:
+  # Regra para detectar o uso de dangerouslySetInnerHTML, o equivalente do React a '.innerHTML'.
+  # Isso é uma porta de entrada para ataques de Cross-Site Scripting (XSS) no-framework.
+  - id: react-dangerouslysetinnerhtml
+    patterns:
+      - pattern-inside: |
+          <... dangerouslySetInnerHTML={{ __html: $DATA }} ... />
+    message: >-
+      O uso de 'dangerouslySetInnerHTML' pode expor sua aplicação a ataques de Cross-Site Scripting (XSS)
+      se os dados em '__html' não forem estritamente controlados e sanitizados.
+      Evite usar esta propriedade sempre que possível.
+    languages:
+      - javascript
+      - typescript
+      - tsx
+      - jsx
+    severity: ERROR
+
+  # Regra para detectar o uso de AsyncStorage, que não é criptografado.
+  # Ótima para encontrar armazenamento inseguro de dados sensíveis.
+  - id: insecure-asyncstorage
+    patterns:
+      - pattern-either:
+          - pattern: AsyncStorage.setItem(...)
+          - pattern: import AsyncStorage from '@react-native-async-storage/async-storage'
+    message: >-
+      'AsyncStorage' armazena dados em texto plano no dispositivo. Não o utilize para guardar
+      informações sensíveis como tokens de sessão, senhas ou dados de usuário.
+      Para isso, prefira uma alternativa criptografada como 'expo-secure-store'.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+
+  # Regra para detectar senhas ou segredos "hardcoded" no código.
+  # Esta regra continua muito relevante para qualquer projeto.
+  - id: hardcoded-secret
+    patterns:
+      - pattern-either:
+          - pattern: (SECRET|PASSWORD|TOKEN|API_KEY|PRIVATE_KEY) = "$..."
+          - pattern: (secret|password|token|api_key|private_key) = "$..."
+          - pattern: (Secret|Password|Token|ApiKey|PrivateKey) = "$..."
+    message: >-
+      Foi encontrado um possível segredo (senha, token ou chave de API) 'hardcoded' no código.
+      Segredos devem ser gerenciados através de variáveis de ambiente ou um serviço de
+      gerenciamento de segredos (como GitHub Secrets, AWS Secrets Manager, etc.),
+      e nunca devem ser comitados no repositório.
+    languages:
+      - generic
+    severity: ERROR
+
+  # Regra para detectar a presença de console.log, que pode vazar informações em produção.
+  - id: debug-log-in-code
+    patterns:
+      - pattern: console.log(...)
+    message: >-
+      Logs de depuração como 'console.log' podem vazar informações sensíveis
+      se permanecerem no código de produção. Considere usar uma biblioteca de log
+      configurável ou remover as chamadas antes do deploy.
+    languages:
+      - javascript
+      - typescript
+    severity: INFO
