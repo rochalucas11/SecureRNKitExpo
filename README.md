@@ -4,6 +4,9 @@ O SecureRNKit-Expo é um boilerplate (template base) para o desenvolvimento de a
 
 O objetivo é minimizar vulnerabilidades comuns em aplicações móveis, como XSS, problemas de armazenamento de tokens e comunicação de rede insegura, permitindo que as equipes de desenvolvimento construam com confiança.
 
+📸 Screenshots
+Aqui você pode adicionar capturas de tela (screenshots) da sua aplicação em funcionamento. Elas ajudam a dar uma ideia visual rápida do projeto.
+
 ✨ Funcionalidades de Segurança Implementadas
 Este boilerplate inclui as seguintes medidas de segurança:
 
@@ -29,9 +32,19 @@ Validação de Esquemas de Dados (Zod):
 
 Utiliza a biblioteca Zod para definir e validar esquemas de dados, garantindo que as entradas da aplicação e as respostas das APIs estejam no formato esperado e correspondam aos tipos definidos. Isso previne erros de dados e potenciais manipulações.
 
+SSL/TLS Pinning:
+
+Implementação de pinning de chave pública usando react-native-ssl-public-key-pinning, garantindo que a aplicação se conecte apenas a servidores com chaves públicas pré-determinadas, mitigando ataques Man-in-the-Middle (MITM). (Requer configuração manual das chaves).
+
 Detecção de Root/Jailbreak:
 
 Usa react-native-device-info para verificar se o dispositivo está rooted (Android) ou jailbroken (iOS), permitindo que a aplicação tome ações preventivas (ex: alertar o usuário, desabilitar funcionalidades sensíveis).
+
+Configurações Nativas de Segurança:
+
+iOS: Confia no App Transport Security (ATS) para impor HTTPS por padrão.
+
+Android: Configura o Network Security Configuration para forçar HTTPS e desabilitar explicitamente o tráfego de texto claro para os domínios da API.
 
 Gerenciamento Seguro de Variáveis de Ambiente:
 
@@ -51,6 +64,8 @@ TypeScript
 Axios (para requisições HTTP)
 
 expo-secure-store (para armazenamento seguro)
+
+react-native-ssl-public-key-pinning (para SSL Pinning)
 
 react-native-device-info (para informações e segurança do dispositivo)
 
@@ -79,9 +94,7 @@ cd SecureRNKitExpo
 Instale as Dependências:
 
 npm install
-
 # ou
-
 yarn install
 
 Configuração do Ambiente (.env):
@@ -91,6 +104,8 @@ API_BASE_URL=https://api.seubackend.com/v1 # Substitua pela URL da sua API
 JWT_SECRET_KEY=sua_chave_secreta_jwt_para_testes # Exemplo
 
 Importante: Nunca comite seu arquivo .env para o controle de versão!
+
+Configuração do SSL Pinning (Opcional, mas Recomendado):
 
 Obtenha o hash SHA256 Base64 da chave pública do certificado do seu servidor (substitua api.seubackend.com pelo seu domínio real):
 
@@ -119,32 +134,32 @@ Rodar em Emulador/Simulador: Pressione a para Android ou i para iOS no terminal 
 A estrutura do projeto é organizada para clareza e manutenção, separando as preocupações de segurança, serviços e componentes da UI.
 
 SecureRNKit-Expo/
-├── app/ # Rotas do Expo Router (navegação baseada em arquivos)
-│ ├── (tabs)/ # Agrupamento de rotas com abas (ex: Home, Explore)
-│ │ ├── \_layout.tsx
-│ │ ├── index.tsx # Tela de exemplo principal
-│ │ └── explore.tsx # Tela de exemplo
-│ ├── \_layout.tsx # Layout principal da aplicação e Stack Navigator
-│ └── modal.tsx # Exemplo de modal
+├── app/                  # Rotas do Expo Router (navegação baseada em arquivos)
+│   ├── (tabs)/           # Agrupamento de rotas com abas (ex: Home, Explore)
+│   │   ├── _layout.tsx
+│   │   ├── index.tsx     # Tela de exemplo principal
+│   │   └── explore.tsx   # Tela de exemplo
+│   ├── _layout.tsx       # Layout principal da aplicação e Stack Navigator
+│   └── modal.tsx         # Exemplo de modal
 ├── src/
-│ ├── components/ # Componentes React reutilizáveis
-│ ├── services/ # Módulos de serviço (API, autenticação, armazenamento seguro, segurança do dispositivo)
-│ │ ├── api.ts # Cliente Axios
-│ │ ├── auth.ts # Lógica de autenticação (login, logout, refresh token)
-│ │ ├── secureStorage.ts# Armazenamento seguro de tokens (expo-secure-store)
-│ │ └── deviceSecurity.ts# Detecção de root/jailbreak e outras verificações de dispositivo
-│ ├── utils/ # Funções utilitárias (sanitização, validação de esquemas)
-│ │ ├── sanitization.ts # Funções para escapar HTML e remover tags
-│ │ └── validationSchemas.ts # Esquemas de validação de dados (Zod)
-│ ├── hooks/ # Custom Hooks React
-│ ├── contexts/ # Context API (ou store para Redux/Zustand, se utilizado)
-│ └── assets/ # Imagens, fontes, etc.
-├── docs/ # Documentação do projeto
-│ └── SECURITY.md # **Documento detalhado sobre as decisões de segurança**
-├── .env # Variáveis de ambiente (não versionado)
-├── babel.config.js # Configuração do Babel (incluindo react-native-dotenv)
-├── package.json # Dependências e scripts do projeto
-├── tsconfig.json # Configuração do TypeScript
+│   ├── components/       # Componentes React reutilizáveis
+│   ├── services/         # Módulos de serviço (API, autenticação, armazenamento seguro, segurança do dispositivo)
+│   │   ├── api.ts          # Cliente Axios com interceptores e SSL Pinning
+│   │   ├── auth.ts         # Lógica de autenticação (login, logout, refresh token)
+│   │   ├── secureStorage.ts# Armazenamento seguro de tokens (expo-secure-store)
+│   │   └── deviceSecurity.ts# Detecção de root/jailbreak e outras verificações de dispositivo
+│   ├── utils/            # Funções utilitárias (sanitização, validação de esquemas)
+│   │   ├── sanitization.ts # Funções para escapar HTML e remover tags
+│   │   └── validationSchemas.ts # Esquemas de validação de dados (Zod)
+│   ├── hooks/            # Custom Hooks React
+│   ├── contexts/         # Context API (ou store para Redux/Zustand, se utilizado)
+│   └── assets/           # Imagens, fontes, etc.
+├── docs/                 # Documentação do projeto
+│   └── SECURITY.md       # **Documento detalhado sobre as decisões de segurança**
+├── .env                  # Variáveis de ambiente (não versionado)
+├── babel.config.js       # Configuração do Babel (incluindo react-native-dotenv)
+├── package.json          # Dependências e scripts do projeto
+├── tsconfig.json         # Configuração do TypeScript
 └── ... outros arquivos de configuração Expo/React Native
 
 🔒 Documentação de Segurança Aprofundada
@@ -164,4 +179,4 @@ Políticas de Cache Seguras: Implementar cabeçalhos de cache seguros para recur
 Atualizações de Dependências: Manter todas as dependências atualizadas regularmente para mitigar vulnerabilidades conhecidas.
 
 🤝 Contribuição
-Contribuições são bem-vindas! Se você tiver sugestões, melhorias ou encontrar bugs, sinta-se à vontade para abrir uma issue ou enviar um pull request.\*\*\*\*
+Contribuições são bem-vindas! Se você tiver sugestões, melhorias ou encontrar bugs, sinta-se à vontade para abrir uma issue ou enviar um pull request.
